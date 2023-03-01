@@ -1,11 +1,23 @@
 # C-Arboreal-Ants
-This repository contains the C implementation of Arboreal-Ants (https://github.com/shivamg13/Arboreal-Ants) for the paper:
+
+This project is developed based on the Python ant algorithm project Arboreal-Ants (https://github.com/shivamg13/Arboreal-Ants), and is rewritten as a C language version.
+
+This repository contains the code for the paper:
 
 <b>Distributed Algorithms from Arboreal Ants for the Shortest Path Problem</b>
+
 Shivam Garg*, Kirankumar Shiragur*, Deborah M. Gordon, Moses Charikar
 
 ## Getting started
 
 You can start by cloning our repository and following the steps below.
+
+## Project contributors
+
+- @PKUcoldkeyboard: the main developer of the project
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for more information.
 
 
