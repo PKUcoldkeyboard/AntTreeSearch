@@ -18,6 +18,7 @@ You can start by cloning our repository and following the steps below.
 - @putao537: one developer of the project
 - @wangweidacv: one developer of the project
 - @flower3d: one developer of the project
+- @homzer: one developer of the project
 
 ## License
 
