@@ -14,7 +14,10 @@ You can start by cloning our repository and following the steps below.
 
 ## Project contributors
 
-- @PKUcoldkeyboard: the main developer of the project
+- @PKUcoldkeyboard: the owner of the project
+- @putao537: one developer of the project
+- @wangweidacv: one developer of the project
+- @flower3d: one developer of the project
 
 ## License
 
