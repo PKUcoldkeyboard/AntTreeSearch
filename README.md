@@ -1,4 +1,4 @@
-# C-Arboreal-Ants
+# Awesome-Arboreal-Ants
 
 本项目是根据论文[1] Garg S, Shiragur K, Gordon D M, et al. Distributed algorithms from arboreal ants for the shortest path problem[J]. Proceedings of the National Academy of Sciences, 2023, 120(6): e2207959120，基于C语言复现受树栖蚂蚁行为启发的用于解决最短路径问题的分布式算法————蚂蚁树搜索（ATS）算法。
 
@@ -6,7 +6,7 @@ ATS使用的一些关键概念包括信息素轨迹，即蚂蚁四处移动时�
 
 为了实现 ATS，论文作者使用网络系统中节点之间的消息传递。每个节点代表一个蚁群，它们在图表中沿着不同的路径寻找食物。当每个蚁群利用有关其周围环境的本地信息找到较短的路径并相应地更新费洛蒙（信息素）时，其他蚁群可以沿着这些路径寻求更好的解决方案。即使在处理大型图表或复杂网络时，这种方法也具有可扩展性和高效性，而传统的集中式方法可能不起作用。
 
-本项目的实现是基于C语言，可以直接下载源代码并编译运行。详细的使用方法请参考项目中的 README 文件。
+本项目的实现是基于C++，可以直接下载源代码并编译运行。详细的使用方法请参考项目中的 README 文件。
 
 ## 算法原理
 
