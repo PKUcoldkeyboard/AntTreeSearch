@@ -1,6 +1,6 @@
 # Awesome-Arboreal-Ants
 
-本项目是根据论文[1] Garg S, Shiragur K, Gordon D M, et al. Distributed algorithms from arboreal ants for the shortest path problem[J]. Proceedings of the National Academy of Sciences, 2023, 120(6): e2207959120，基于C语言复现受树栖蚂蚁行为启发的用于解决最短路径问题的分布式算法————蚂蚁树搜索（ATS）算法。
+本项目是根据论文[1] Garg S, Shiragur K, Gordon D M, et al. Distributed algorithms from arboreal ants for the shortest path problem[J]. Proceedings of the National Academy of Sciences, 2023, 120(6): e2207959120，基于C++复现受树栖蚂蚁行为启发的用于解决最短路径问题的分布式算法————蚂蚁树搜索（ATS）算法。
 
 ATS使用的一些关键概念包括信息素轨迹，即蚂蚁四处移动时留下的化学信号；以及树木分解，即将图表分解成较小的子图或 “树” 以使其更易于导航；路径泄漏，即在最短路径通过节点时丢失了多少有关最短路径的信息。
 
