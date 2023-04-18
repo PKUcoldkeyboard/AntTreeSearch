@@ -1,4 +1,4 @@
-# Awesome-Arboreal-Ants
+# AntTreeSearch
 
 本项目是根据论文[1] Garg S, Shiragur K, Gordon D M, et al. Distributed algorithms from arboreal ants for the shortest path problem[J]. Proceedings of the National Academy of Sciences, 2023, 120(6): e2207959120，基于C++复现受树栖蚂蚁行为启发的用于解决最短路径问题的分布式算法————蚂蚁树搜索（ATS）算法。
 
