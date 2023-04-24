@@ -1,120 +1,119 @@
 #ifndef __BASELINE_HPP__
 #define __BASELINE_HPP__
-#define N 4
+#define N 100
 #include "spdlog_common.h"
-#include <fstream>
-#include <sstream>
+#include "utils.hpp"
 #include <iostream>
 #include <iomanip>
 
 class Baseline {
 public:
     // 收敛阈值
-    float conv_thold;
+    double conv_thold;
     // 信息素衰减因子
-    float decay;
+    double decay;
     // 最大迭代次数
     int max_iter;
+    // 打印周期
+    int print_period;
+    // 邻接矩阵
+    std::vector<std::vector<int>> adj;
     // 信息素矩阵
-    float pheromone[N][N];
-    // 归一化的信息素矩阵
-    float norm_pheromone[N][N];
+    std::vector<std::vector<double>> pheromone;
     // 节点流
-    float ff_node[N], bf_node[N];
+    std::vector<double> ff_node, bf_node;
     // 边流
-    float ff_edge[N][N], bf_edge[N][N];
+    std::vector<std::vector<double>> ff_edge, bf_edge;
     // 初始注入量
-    float ff_start = 1.0f, bf_start = 1.0f;
-    // 当前时刻或迭代次数t
-    int t;
+    double ff_start = 1.0, bf_end = 1.0;
+    // 当前时刻或迭代次数
+    int iter;
     // 起始位置和终止位置
     int start = 0, end = N - 1;
 
-    Baseline(float conv_thold, float decay, int max_iter) : conv_thold(conv_thold), decay(decay), max_iter(max_iter) {}
+    Baseline(double conv_thold, double decay, int max_iter, int print_period) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period) {
+        adj.resize(N, std::vector<int>(N, 0));
+        pheromone.resize(N, std::vector<double>(N, 0.0));
+        ff_edge.resize(N, std::vector<double>(N, 0.0));
+        bf_edge.resize(N, std::vector<double>(N, 0.0));
+        ff_node.resize(N, 0.0);
+        bf_node.resize(N, 0.0);
+    }
 
     ~Baseline() {}
 
-    void run() {
-        for (t = 0; t < max_iter; t++) {
-            iterate();
-            // if (converged()) {
-            //     break;
-            // }
+    /**
+     * 读取数据集文件
+    */
+    void init(const std::string &path) {
+        FILE* fp = fopen(path.c_str(), "r");
+        if (fp == nullptr) {
+            SPDLOG_ERROR("Failed to open file: {}", path);
+            exit(-1);
         }
-        // 打印当前的pheromone矩阵到tmp.txt文件中
-        std::ofstream outfile("tmp.txt");
+        // 初始化adj与pheromone
+        int rd;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                // 设置3位小数
-                outfile << std::fixed << std::setprecision(2) << pheromone[i][j] << " ";
+                int val;
+                rd = fscanf(fp, "%d ", &val);
+                adj[i][j] = val;
+                pheromone[i][j] = (double)val;
             }
-            outfile << std::endl;
+            rd = fscanf(fp, "\n");
         }
-        // 打印当前的ff_node和bf_node到tmp.txt文件中
-        outfile << std::endl;
-        for (int i = 0; i < N; i++) {
-            outfile << std::fixed << std::setprecision(2) << ff_node[i] << " ";
-        }
-        outfile << std::endl;
-        outfile << std::endl;
-        for (int i = 0; i < N; i++) {
-            outfile << std::fixed << std::setprecision(2) << bf_node[i] << " ";
-        }
-        outfile << std::endl;
-        outfile << std::endl;
-        // 打印当前的ff_edge和bf_edge到tmp.txt文件中
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                outfile << std::fixed << std::setprecision(2) << ff_edge[i][j] << " ";
-            }
-            outfile << std::endl;
-        }
-        outfile << std::endl;
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                outfile << std::fixed << std::setprecision(2) << bf_edge[i][j] << " ";
-            }
-            outfile << std::endl;
-        }
-        outfile.close();
+        fclose(fp);
     }
 
-    // 读取地图文件，初始化信息素矩阵和蚂蚁流矩阵
-    void init(std::string filename) {
-        std::ifstream infile(filename);
-        if (!infile) {
-            SPDLOG_ERROR("Unable to open file {}", filename);
-            return;
+    void run() {
+        // 使用dijkstra计算最短路径
+        const auto &path = dijkstra(start, end, adj);
+        std::fill(adj.begin(), adj.end(), std::vector<int>(N, 0));
+        for (int i = 0; i < path.size() - 1; i++) {
+            adj[path[i]][path[i + 1]] = 1;
         }
+        ff_node[start] = ff_start;
+        bf_node[end] = bf_end;
+        for (iter = 0; iter < max_iter; iter++) {
+            auto f_norm_pher = normalize_front_pheromone();
+            auto b_norm_pher = normalize_backward_pheromone();
+            auto f_min = min(f_norm_pher);
+            auto b_min = min(b_norm_pher);
 
-        std::stringstream buffer;
-        buffer << infile.rdbuf();
-        std::string file_contents = buffer.str();
-        std::istringstream iss(file_contents);
+            if (iter % print_period == 0) {
+                SPDLOG_INFO("Iteration {}, {:03.5f}, {:03.5f}", iter, f_min, b_min);
+            }
 
-        // 初始化信息素矩阵
-        for (int i = 0; i < N; ++i) {
-            for (int j = 0; j < N; ++j) {
-                int val;
-                iss >> val;
-                pheromone[i][j] = (float)val; 
+            if (f_min > conv_thold && b_min > conv_thold) {
+                SPDLOG_INFO("Converged at iteration {}", iter);
+                break;
+            } 
+            
+            update_front_edge_flow(f_norm_pher);
+            update_backward_edge_flow(b_norm_pher);
+            update_front_node_flow();
+            update_backward_node_flow();
+            update_pheromone();
+
+        }
+    }
+
+    // 最短路径上对应的信息素最小值
+    double min(std::vector<std::vector<double>> &norm_pheromone) {
+        double res = std::numeric_limits<double>::max();
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (adj[i][j] == 1) {
+                    res = std::min(res, norm_pheromone[i][j]);
+                }
             }
         }
-
-        // 初始化蚂蚁节点流
-        memset(ff_node, 0.0f, sizeof(ff_node));
-        memset(bf_node, 0.0f, sizeof(bf_node));
-        ff_node[start] = ff_start;
-        bf_node[end] = bf_start;
-
-        // 初始化蚂蚁边流矩阵
-        memset(ff_edge, 0.0f, sizeof(ff_edge));
-        memset(bf_edge, 0.0f, sizeof(bf_edge));
+        return res;
     }
 
     // 前向信息素矩阵归一化
-    void normalize_front_pheromone() {
-        memset(norm_pheromone, 0.0f, sizeof(norm_pheromone));
+    std::vector<std::vector<double>> normalize_front_pheromone() {
+        std::vector<std::vector<double>> res(N, std::vector<double>(N, 0.0));
         for (int i = 0; i < N; i++) {
             float sum = 0.0f;
             for (int j = 0; j < N; j++) {
@@ -124,14 +123,15 @@ public:
                 continue;
             }
             for (int j = 0; j < N; j++) {
-                norm_pheromone[i][j] = pheromone[i][j] / sum;
+                res[i][j] = pheromone[i][j] / sum;
             }
         }
+        return res;
     }
 
     // 后向信息素矩阵归一化
-    void normalize_backward_pheromone() {
-        memset(norm_pheromone, 0.0f, sizeof(norm_pheromone));
+    std::vector<std::vector<double>> normalize_backward_pheromone() {
+        std::vector<std::vector<double>> res(N, std::vector<double>(N, 0.0));
         for (int j = 0; j < N; j++) {
             float sum = 0.0f;
             for (int i = 0; i < N; i++) {
@@ -141,9 +141,10 @@ public:
                 continue;
             }
             for (int i = 0; i < N; i++) {
-                norm_pheromone[i][j] = pheromone[i][j] / sum;
+                res[i][j] = pheromone[i][j] / sum;
             }
         }
+        return res;
     }
 
     // 更新信息素矩阵
@@ -164,6 +165,8 @@ public:
             }
             ff_node[j] = ff_sum;
         }   
+        ff_node[start] = ff_start;
+        ff_node[end] = 0.0;
     }
 
     // 更新反向节点flow
@@ -175,10 +178,12 @@ public:
             }
             bf_node[i] = bf_sum;
         }
+        bf_node[end] = bf_end;
+        bf_node[start] = 0.0;
     }
 
     // 更新前向边flow
-    void update_front_edge_flow() {
+    void update_front_edge_flow(std::vector<std::vector<double>> &norm_pheromone) {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 ff_edge[i][j] = ff_node[i] * norm_pheromone[i][j];
@@ -187,29 +192,13 @@ public:
     }
 
     // 更新反向边flow
-    void update_backward_edge_flow() {
+    void update_backward_edge_flow(std::vector<std::vector<double>> &norm_pheromone) {
         for (int j = 0; j < N; j++) {
             for (int i = 0; i < N; i++) {
                 bf_edge[i][j] = bf_node[j] * norm_pheromone[i][j];
             }
         }
     }
-
-    // 迭代一次
-    void iterate() {
-        normalize_front_pheromone();
-        update_front_edge_flow();
-        normalize_backward_pheromone();
-        update_backward_edge_flow();
-        update_front_node_flow();
-        update_backward_node_flow();
-        update_pheromone();
-    }
-
-    bool converged() {
-        return true;
-    }
-
 };
 
 #endif // __BASELINE_HPP__
