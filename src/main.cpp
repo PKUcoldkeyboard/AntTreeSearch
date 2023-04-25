@@ -10,6 +10,8 @@ int main() {
         SPDLOG_ERROR(ini.error());
         exit(-1);
     }
+
+    ini.show();
     
     double decay = ini.get_double("decay");
     double conv_thold = ini.get_double("conv_thold");
@@ -17,7 +19,8 @@ int main() {
     int print_period = ini.get_int("print_period");
 
     Baseline baseline(conv_thold, decay, max_iter, print_period);
-    baseline.init("dataset/data/gnp_w_loop_w_leakage_0.txt");
+    baseline.init("dataset/data/gnpLoc_wo_loop_wo_leakage_55.txt");
+    // baseline.init("test.txt");
     baseline.run();
 
     return 0;

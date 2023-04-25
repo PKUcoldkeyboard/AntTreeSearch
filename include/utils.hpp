@@ -1,10 +1,11 @@
 #ifndef __UTILS_HPP__
 #define __UTILS_HPP__
-#define N 100
 #define INF 0x3f3f3f3f
 #include <vector>
 #include <queue>
 #include <algorithm>
+
+constexpr int N = 100;
 
 // 链式前向星
 class Graph {
@@ -32,7 +33,7 @@ std::vector<int> dijkstra(int start, int end, std::vector<std::vector<int>> &gra
     Graph g(N);
     for (int u = 0; u < N; u++) {
         for (int v = 0; v < N; v++) {
-            if (graph[u][v] != 0) {
+            if (graph[u][v] == 1) {
                 g.add_edge(u, v);
             }
         }
@@ -43,7 +44,12 @@ std::vector<int> dijkstra(int start, int end, std::vector<std::vector<int>> &gra
     std::vector<int> prev(N, -1);
     std::vector<int> dist(N, INF);
     std::vector<bool> visited(N, false);
-    std::priority_queue<int> pq;
+
+    // 自定义dist的比较函数的优先队列，每次pop最小的
+    auto cmp = [&dist](int u, int v) {
+        return dist[u] > dist[v];
+    };
+    std::priority_queue<int, std::vector<int>, decltype(cmp)> pq(cmp);
 
     // 使用优先队列的dijkstra
     dist[start] = 0;
@@ -57,6 +63,9 @@ std::vector<int> dijkstra(int start, int end, std::vector<std::vector<int>> &gra
         visited[u] = true;
         for (int i = g.head[u]; i != -1; i = g.edges[i].next) {
             int v = g.edges[i].to;
+            if (visited[v]) {
+                continue;
+            }
             if (dist[v] > dist[u] + 1) {
                 dist[v] = dist[u] + 1;
                 prev[v] = u;
