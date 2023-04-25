@@ -3,9 +3,14 @@
 #include "baseline.hpp"
 #include "utils.hpp"
 
-int main() {
+int main(int argc, const char* argv[]) {
+    if (argc != 2) {
+        SPDLOG_ERROR("Usage: {} <config file>", argv[0]);
+        exit(-1);
+    }
+    std::string path = argv[1];
     // 读取配置文件
-    auto ini = util::inifile("conf/linear/base.ini");
+    auto ini = util::inifile(path);
     if (!ini.good()) {
         SPDLOG_ERROR(ini.error());
         exit(-1);
