@@ -3,6 +3,7 @@
 #include "spdlog_common.h"
 #include "utils.hpp"
 #include <iostream>
+#include <random>
 #include <eigen3/Eigen/Dense>
 
 class Baseline {
@@ -31,8 +32,10 @@ public:
     int start = 0, end = N - 1;
     // 初始化种子
     int seed;
+    // 是否有泄漏
+    bool min_leakage;
 
-    Baseline(double conv_thold, double decay, int max_iter, int print_period, int convergence_check_period, int start_seed) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period), convergence_check_period(convergence_check_period), seed(start_seed), adj(N, N), pheromone(N, N) {
+    Baseline(double conv_thold, double decay, int max_iter, int print_period, int convergence_check_period, int start_seed, bool min_leakage) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period), convergence_check_period(convergence_check_period), seed(start_seed), min_leakage(min_leakage), adj(N, N), pheromone(N, N) {
         adj = Eigen::MatrixXd::Zero(N, N);
         pheromone = Eigen::MatrixXd::Zero(N, N);
     }
@@ -63,20 +66,41 @@ public:
         srand(seed);
         ff_start = ((double) rand() / (RAND_MAX)) * 0.5 + 0.5;
         bf_end = ((double) rand() / (RAND_MAX)) * 0.5 + 0.5;
-        inc_rate = 1.1;
     }
 
     void run() {
-        // 使用dijkstra计算最短路径
-        auto path = dijkstra(start, end, adj);
 
         // 初始化节点流
         Eigen::MatrixXd ff = Eigen::MatrixXd::Zero(1, N);
         Eigen::MatrixXd bf = Eigen::MatrixXd::Zero(1, N);
-        // 节点泄露率
-        Eigen::MatrixXd passge = Eigen::MatrixXd::Ones(1, N);
+
+        // 节点泄露因子
+        Eigen::MatrixXd passage;
+        if (min_leakage) {
+            // [0, 1)上均匀分布的随机数
+            // std::random_device rd;
+            // std::mt19937 gen(rd());
+            // std::uniform_real_distribution<> dis(0.0, 1.0);
+            // passage = Eigen::MatrixXd::NullaryExpr(1, N, [&]() { return dis(gen); });
+            // passage = 0.1 * passage.array() + 0.9;
+            passage = Eigen::MatrixXd::Ones(1, N);
+            inc_rate = 1.1;
+        } else {
+            passage = Eigen::MatrixXd::Ones(1, N);
+            inc_rate = 1.1;
+        }
+
         ff(0, start) = ff_start;
         bf(0, end) = bf_end;
+
+        // 使用dijkstra计算最短路径
+        std::vector<int> path;
+        if (min_leakage) {
+            // path = min_leakage_dijkstra(start, end, adj, passage);
+            path = dijkstra(start, end, adj);
+        } else {
+            path = dijkstra(start, end, adj);
+        }
 
         for (iter = 0; iter < max_iter; iter++) {
             // // 归一化pheromone
@@ -95,8 +119,8 @@ public:
                 SPDLOG_INFO("Iteration: {}, {:03.5f}, {:03.5f}", iter, f_min, b_min);
             }
 
-            Eigen::MatrixXd ff_new = ff * f_norm_pher;
-            Eigen::MatrixXd bf_new = bf * b_norm_pher;
+            Eigen::MatrixXd ff_new = element_wise_multiply(ff * f_norm_pher, passage);
+            Eigen::MatrixXd bf_new = element_wise_multiply(bf * b_norm_pher, passage);
             ff_new(0, start) = ff_start * inc_rate;
             bf_new(0, end) = bf_end * inc_rate;
             ff_new(0, end) = 0.0;
@@ -120,17 +144,6 @@ public:
             double sum = res.row(i).sum();
             sum = sum == 0 ? 1e-300 : sum;
             res.row(i) /= sum;
-        }
-        return res;
-    }
-
-    Eigen::MatrixXd element_wise_multiply(Eigen::MatrixXd &mat1, Eigen::MatrixXd &mat2) {
-        Eigen::MatrixXd res(N, N);
-        for (int i = 0; i < N; i++) {
-            double product = mat2(i, 0);
-            for (int j = 0; j < N; j++) {
-                res(i, j) = mat1(i, j) * product;
-            }
         }
         return res;
     }

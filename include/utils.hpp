@@ -1,6 +1,5 @@
 #ifndef __UTILS_HPP__
 #define __UTILS_HPP__
-#define INF 0x3f3f3f3f
 #include <vector>
 #include <queue>
 #include <algorithm>
@@ -44,7 +43,7 @@ std::vector<int> dijkstra(int start, int end, Eigen::MatrixXd &graph) {
     // 初始化
     std::vector<int> path;
     std::vector<int> prev(N, -1);
-    std::vector<int> dist(N, INF);
+    std::vector<double> dist(N, 1e300);
     std::vector<bool> visited(N, false);
 
     // 自定义dist的比较函数的优先队列，每次pop最小的
@@ -87,8 +86,24 @@ std::vector<int> dijkstra(int start, int end, Eigen::MatrixXd &graph) {
     return path;
 }
 
+// 矩阵mat1的每行分别乘以mat2的对应行
+Eigen::MatrixXd element_wise_multiply(Eigen::MatrixXd mat1, Eigen::MatrixXd mat2) {
+    int rows = mat1.rows();
+    int cols = mat1.cols();
+    Eigen::MatrixXd res(rows, cols);
+    for (int i = 0; i < rows; i++) {
+        double product = mat2(i, 0);
+        for (int j = 0; j < cols; j++) {
+            res(i, j) = mat1(i, j) * product;
+        }
+    }
+    return res;
+}
+
 std::vector<int> min_leakage_dijkstra(int start, int end, Eigen::MatrixXd &graph, Eigen::MatrixXd &passage) {
-    Eigen::MatrixXd weighted_graph = graph;
+    Eigen::MatrixXd weights = -passage.array().log();
+    Eigen::MatrixXd trans_weights = weights.transpose();
+    Eigen::MatrixXd weighted_graph = element_wise_multiply(graph, trans_weights);
     return dijkstra(start, end, weighted_graph);
 }
 

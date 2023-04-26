@@ -9,7 +9,7 @@ std::unordered_map<std::string, std::string> g_map = {
     {"gnp_inc-flow_with_loop.ini", "gnp_w_loop_wo_leakage_"},
     {"gnp_inc-flow.ini", "gnp_wo_loop_wo_leakage_"},
     {"gnp_leakage_with_loop.ini", "gnp_w_loop_w_leakage_"},
-    {"gnp_leakage.ini", "gnp_wo_loop_w_leakge_"},
+    {"gnp_leakage.ini", "gnp_wo_loop_w_leakage_"},
     {"gnp-local_inc-flow_with_loop.ini", "gnpLoc_w_loop_wo_leakage_"},
     {"gnp-local_inc-flow.ini", "gnpLoc_wo_loop_wo_leakage_"},
     {"gnp-local_leakage_with_loop.ini", "gnpLoc_w_loop_w_leakage_"},
@@ -53,7 +53,7 @@ int main(int argc, const char* argv[]) {
         return 0;
     }
 
-    Baseline baseline(conv_thold, decay, max_iter, print_period, convergence_check_period, start_seed);
+    Baseline baseline(conv_thold, decay, max_iter, print_period, convergence_check_period, start_seed, min_leakage);
     for (int i = 0; i < num_instances; i++) {
         baseline.seed++;
         baseline.init(data_prefix + std::to_string(i) + ".txt");
