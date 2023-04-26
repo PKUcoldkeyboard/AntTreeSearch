@@ -15,6 +15,7 @@ public:
     struct Edge {
         int to;
         int next;
+        double weight;
     };
     Graph(int n) : n(n) {
         head.resize(n, -1);
@@ -22,20 +23,20 @@ public:
     std::vector<Edge> edges;
     std::vector<int> head;
 
-    void add_edge(int u, int v) {
-        edges.emplace_back(Edge{v, head[u]});
+    void add_edge(int u, int v, double weight) {
+        edges.emplace_back(Edge{v, head[u], weight});
         head[u] = edges.size() - 1;
     }
 };
 
 // 使用dijkstra算法计算最短路径，返回路径
-std::vector<int> dijkstra(int start, int end, Eigen::MatrixXi &graph) {
+std::vector<int> dijkstra(int start, int end, Eigen::MatrixXd &graph) {
     // 使用链式前向星重新存图
     Graph g(N);
     for (int u = 0; u < N; u++) {
         for (int v = 0; v < N; v++) {
-            if (graph(u, v) == 1) {
-                g.add_edge(u, v);
+            if (graph(u, v) != 0.0) {
+                g.add_edge(u, v, graph(u, v));
             }
         }
     }
@@ -64,11 +65,12 @@ std::vector<int> dijkstra(int start, int end, Eigen::MatrixXi &graph) {
         visited[u] = true;
         for (int i = g.head[u]; i != -1; i = g.edges[i].next) {
             int v = g.edges[i].to;
+            double weight = g.edges[i].weight;
             if (visited[v]) {
                 continue;
             }
-            if (dist[v] > dist[u] + 1) {
-                dist[v] = dist[u] + 1;
+            if (dist[v] > dist[u] + weight) {
+                dist[v] = dist[u] + weight;
                 prev[v] = u;
                 pq.push(v);
             }
@@ -83,6 +85,11 @@ std::vector<int> dijkstra(int start, int end, Eigen::MatrixXi &graph) {
     }
     std::reverse(path.begin(), path.end());
     return path;
+}
+
+std::vector<int> min_leakage_dijkstra(int start, int end, Eigen::MatrixXd &graph, Eigen::MatrixXd &passage) {
+    Eigen::MatrixXd weighted_graph = graph;
+    return dijkstra(start, end, weighted_graph);
 }
 
 #endif // __UTILS_HPP__

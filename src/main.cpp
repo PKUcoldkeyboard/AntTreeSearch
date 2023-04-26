@@ -6,16 +6,16 @@
 
 // 全局定位map
 std::unordered_map<std::string, std::string> g_map = {
-    {"conf/linear/gnp_inc-flow_with_loop.ini", "gnp_w_loop_wo_leakage_"},
-    {"conf/linear/gnp_inc-flow.ini", "gnp_wo_loop_wo_leakage_"},
-    {"conf/linear/gnp_leakage_with_loop.ini", "gnp_w_loop_w_leakage_"},
-    {"conf/linear/gnp_leakage.ini", "gnp_wo_loop_w_leakge_"},
-    {"conf/linear/gnp-local_inc-flow_with_loop.ini", "gnpLoc_w_loop_wo_leakage_"},
-    {"conf/linear/gnp-local_inc-flow.ini", "gnpLoc_wo_loop_wo_leakage_"},
-    {"conf/linear/gnp-local_leakage_with_loop.ini", "gnpLoc_w_loop_w_leakage_"},
-    {"conf/linear/gnp-local_leakage.ini", "gnpLoc_wo_loop_w_leakage_"},
-    {"conf/linear/grid_inc-flow.ini", "grid_wo_loop_wo_leakage_"},
-    {"conf/linear/grid_leakage.ini", "grid_wo_loop_w_leakage_"}
+    {"gnp_inc-flow_with_loop.ini", "gnp_w_loop_wo_leakage_"},
+    {"gnp_inc-flow.ini", "gnp_wo_loop_wo_leakage_"},
+    {"gnp_leakage_with_loop.ini", "gnp_w_loop_w_leakage_"},
+    {"gnp_leakage.ini", "gnp_wo_loop_w_leakge_"},
+    {"gnp-local_inc-flow_with_loop.ini", "gnpLoc_w_loop_wo_leakage_"},
+    {"gnp-local_inc-flow.ini", "gnpLoc_wo_loop_wo_leakage_"},
+    {"gnp-local_leakage_with_loop.ini", "gnpLoc_w_loop_w_leakage_"},
+    {"gnp-local_leakage.ini", "gnpLoc_wo_loop_w_leakage_"},
+    {"grid_inc-flow.ini", "grid_wo_loop_wo_leakage_"},
+    {"grid_leakage.ini", "grid_wo_loop_w_leakage_"}
 };
 
 int main(int argc, const char* argv[]) {
@@ -43,8 +43,16 @@ int main(int argc, const char* argv[]) {
     bool min_leakage = ini.get_bool("min_leakage");
     std::string graph_type = ini.get_string("graph_type");
     bool with_loop = graph_type == "grid" ? false : ini.get_bool("with_loop");
+    bool no_lin = ini.get_bool("no_lin");
 
-    std::string data_prefix = "dataset/data/" + g_map[path];
+    int pos = path.find('/', path.find('/') + 1);
+    std::string conf_name = path.substr(pos + 1);
+    std::string data_prefix = "dataset/data/" + g_map[conf_name];
+
+    if (no_lin) {
+        return 0;
+    }
+
     Baseline baseline(conv_thold, decay, max_iter, print_period, convergence_check_period, start_seed);
     for (int i = 0; i < num_instances; i++) {
         baseline.seed++;

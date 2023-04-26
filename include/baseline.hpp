@@ -3,7 +3,6 @@
 #include "spdlog_common.h"
 #include "utils.hpp"
 #include <iostream>
-#include <iomanip>
 #include <eigen3/Eigen/Dense>
 
 class Baseline {
@@ -19,7 +18,7 @@ public:
     // 判断是否收敛周期
     int convergence_check_period;
     // 邻接矩阵
-    Eigen::MatrixXi adj;
+    Eigen::MatrixXd adj;
     // 信息素矩阵
     Eigen::MatrixXd pheromone;
     // 初始注入量与增速
@@ -34,7 +33,7 @@ public:
     int seed;
 
     Baseline(double conv_thold, double decay, int max_iter, int print_period, int convergence_check_period, int start_seed) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period), convergence_check_period(convergence_check_period), seed(start_seed), adj(N, N), pheromone(N, N) {
-        adj = Eigen::MatrixXi::Zero(N, N);
+        adj = Eigen::MatrixXd::Zero(N, N);
         pheromone = Eigen::MatrixXd::Zero(N, N);
     }
 
