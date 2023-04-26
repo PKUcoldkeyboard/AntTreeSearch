@@ -31,8 +31,10 @@ public:
     int start = 0, end = N - 1;
     // 初始化种子
     int seed;
+    // 是否有泄漏
+    bool min_leakage;
 
-    Slight(double conv_thold, double decay, int max_iter, int print_period, int convergence_check_period, int start_seed) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period), convergence_check_period(convergence_check_period), seed(start_seed), adj(N, N), pheromone(N, N) {
+    Slight(double conv_thold, double decay, int max_iter, int print_period, int convergence_check_period, int start_seed, bool min_leakage) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period), convergence_check_period(convergence_check_period), seed(start_seed), min_leakage(min_leakage), adj(N, N), pheromone(N, N) {
         adj = Eigen::MatrixXd::Zero(N, N);
         pheromone = Eigen::MatrixXd::Zero(N, N);
     }
