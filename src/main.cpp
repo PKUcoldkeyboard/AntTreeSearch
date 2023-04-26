@@ -1,6 +1,6 @@
 #include "inifile.hpp"
 #include "spdlog_common.h"
-#include "baseline.hpp"
+#include "slight.hpp"
 #include "utils.hpp"
 #include <unordered_map>
 
@@ -53,11 +53,11 @@ int main(int argc, const char* argv[]) {
         return 0;
     }
 
-    Baseline baseline(conv_thold, decay, max_iter, print_period, convergence_check_period, start_seed);
+    Slight slight(conv_thold, decay, max_iter, print_period, convergence_check_period, start_seed);
     for (int i = 0; i < num_instances; i++) {
-        baseline.seed++;
-        baseline.init(data_prefix + std::to_string(i) + ".txt");
-        baseline.run();
+        slight.seed++;
+        slight.init(data_prefix + std::to_string(i) + ".txt");
+        slight.run();
     }
 
     return 0;
