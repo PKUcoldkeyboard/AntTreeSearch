@@ -121,9 +121,14 @@ public:
     }
 
     Eigen::MatrixXd nonlinearty(Eigen::MatrixXd &pher, Eigen::MatrixXd &adj) {
-        auto tmp = pher.array().pow(1.1);
-        auto result = adj * pher.array().pow(1.1).matrix();  
-        return result;
+        Eigen::MatrixXd res(N, N);
+	auto pher_pow = pher.array().pow(1.1).matrix();
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                res(i, j) = adj(i, j) * pher_pow(i, j);
+            }
+        }
+        return res;
     }
 
     // 归一化
