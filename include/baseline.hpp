@@ -16,8 +16,10 @@ public:
     int max_iter;
     // 打印周期
     int print_period;
+    // 判断是否收敛周期
+    int convergence_check_period;
     // 邻接矩阵
-    std::vector<std::vector<int>> adj;
+    Eigen::MatrixXi adj;
     // 信息素矩阵
     Eigen::MatrixXd pheromone;
     // 初始注入量与增速
@@ -28,20 +30,12 @@ public:
     int iter;
     // 起始位置和终止位置
     int start = 0, end = N - 1;
+    // 初始化种子
+    int seed;
 
-    Baseline(double conv_thold, double decay, int max_iter, int print_period) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period), pheromone(N, N) {
-        adj.resize(N, std::vector<int>(N, 0));
+    Baseline(double conv_thold, double decay, int max_iter, int print_period, int convergence_check_period, int start_seed) : conv_thold(conv_thold), decay(decay), max_iter(max_iter), print_period(print_period), convergence_check_period(convergence_check_period), seed(start_seed), adj(N, N), pheromone(N, N) {
+        adj = Eigen::MatrixXi::Zero(N, N);
         pheromone = Eigen::MatrixXd::Zero(N, N);
-
-        // 初始化初始注入量和流速
-        srand(time(NULL));
-        ff_start = ((double) rand() / (RAND_MAX)) * 0.5 + 0.5;
-        bf_end = ((double) rand() / (RAND_MAX)) * 0.5 + 0.5;
-        // ff_start = 1.0;
-        // bf_end = 1.0;
-        inc_rate = 1.1;
-        // 打印ff_start和bf_end
-        SPDLOG_INFO("ff_start: {:03.5f}, bf_end: {:03.5f}", ff_start, bf_end);
     }
 
     ~Baseline() {}
@@ -61,20 +55,21 @@ public:
             for (int j = 0; j < N; j++) {
                 int val;
                 rc = fscanf(fp, "%d ", &val);
-                adj[i][j] = val;
+                adj(i, j) = val;
                 pheromone(i, j) = (double)val;
             }
             rc = fscanf(fp, "\n");
         }
+        // 初始化初始注入量和流速
+        srand(seed);
+        ff_start = ((double) rand() / (RAND_MAX)) * 0.5 + 0.5;
+        bf_end = ((double) rand() / (RAND_MAX)) * 0.5 + 0.5;
+        inc_rate = 1.1;
     }
 
     void run() {
         // 使用dijkstra计算最短路径
-        const auto &path = dijkstra(start, end, adj);
-        std::fill(adj.begin(), adj.end(), std::vector<int>(N, 0));
-        for (int i = 0; i < path.size() - 1; i++) {
-            adj[path[i]][path[i + 1]] = 1;
-        }
+        auto path = dijkstra(start, end, adj);
 
         // 初始化节点流
         Eigen::MatrixXd ff = Eigen::MatrixXd::Zero(1, N);
@@ -89,16 +84,16 @@ public:
             auto f_norm_pher = row_normalize(pheromone);
             Eigen::MatrixXd trans_pher = pheromone.transpose();
             auto b_norm_pher = row_normalize(trans_pher);
-            auto f_min = fmin(f_norm_pher);
-            auto b_min = bmin(b_norm_pher);
+            auto f_min = fmin(f_norm_pher, path);
+            auto b_min = bmin(b_norm_pher, path);
+
+            if (iter % convergence_check_period == 0 && f_min > conv_thold && b_min > conv_thold) {
+                SPDLOG_INFO("Iteration: {}, {:03.5f}, {:03.5f}", iter, f_min, b_min);
+                break;
+            }
 
             if (iter % print_period == 0) {
                 SPDLOG_INFO("Iteration: {}, {:03.5f}, {:03.5f}", iter, f_min, b_min);
-            }
-
-            if (f_min > conv_thold && b_min > conv_thold) {
-                SPDLOG_INFO("Iteration: {}, {:03.5f}, {:03.5f}", iter, f_min, b_min);
-                break;
             }
 
             Eigen::MatrixXd ff_new = ff * f_norm_pher;
@@ -113,14 +108,6 @@ public:
 
             pheromone = pheromone + element_wise_multiply(f_norm_pher, ff_trans) + element_wise_multiply(b_norm_pher, bf_trans).transpose();
             pheromone *= decay;
-
-            // for (int i = 0; i < N; i++) {
-            //     for (int j = 0; j < N; j++) {
-            //         std::cout << std::fixed << std::setprecision(2) << pheromone(i, j) << " ";
-            //     }
-            //     std::cout << std::endl;
-            // }
-            // std::cout << std::endl;
             ff = ff_new / inc_rate;
             bf = bf_new / inc_rate;
             pheromone = pheromone / inc_rate;
@@ -150,27 +137,19 @@ public:
     }
 
     // 查找符合条件的前向矩阵中的最小值
-    double fmin(Eigen::MatrixXd &mat) {
+    double fmin(Eigen::MatrixXd &mat, std::vector<int> &path) {
         double res = 1e300;
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (adj[i][j] == 1) {
-                    res = std::min(res, mat(i, j));
-                }
-            }
+        for (int i = 0; i < path.size() - 1; i++) {
+            res = std::min(res, mat(path[i], path[i + 1]));
         }
         return res;
     }
 
     // 查找符合条件的反向矩阵中的最小值
-    double bmin(Eigen::MatrixXd &mat) {
+    double bmin(Eigen::MatrixXd &mat, std::vector<int> &path) {
         double res = 1e300;
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (adj[j][i] == 1) {
-                    res = std::min(res, mat(i, j));
-                }
-            }
+        for (int i = 0; i < path.size() - 1; i++) {
+            res = std::min(res, mat(path[i + 1], path[i]));
         }
         return res;
     }
