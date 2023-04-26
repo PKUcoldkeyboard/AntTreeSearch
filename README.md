@@ -28,7 +28,7 @@ cmake -B build && cmake --build build
 ```
 - 运行
 ```
-./build/ATS
+./build/ATS <config file>
 ```
 
 ## 数据集

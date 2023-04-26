@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <eigen3/Eigen/Dense>
 
 constexpr int N = 100;
 
@@ -28,12 +29,12 @@ public:
 };
 
 // 使用dijkstra算法计算最短路径，返回路径
-std::vector<int> dijkstra(int start, int end, std::vector<std::vector<int>> &graph) {
+std::vector<int> dijkstra(int start, int end, Eigen::MatrixXi &graph) {
     // 使用链式前向星重新存图
     Graph g(N);
     for (int u = 0; u < N; u++) {
         for (int v = 0; v < N; v++) {
-            if (graph[u][v] == 1) {
+            if (graph(u, v) == 1) {
                 g.add_edge(u, v);
             }
         }
