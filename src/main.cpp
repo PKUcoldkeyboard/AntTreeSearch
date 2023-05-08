@@ -1,6 +1,7 @@
 #include "inifile.hpp"
 #include "spdlog_common.h"
-#include "baseline.hpp"
+#include "baseline.hpp" 
+#include "slight.hpp"
 #include "utils.hpp"
 #include <unordered_map>
 
@@ -45,11 +46,17 @@ int main(int argc, const char* argv[]) {
     bool with_loop = graph_type == "grid" ? false : ini.get_bool("with_loop");
     bool no_lin = ini.get_bool("no_lin");
 
-    int pos = path.find('/', path.find('/') + 1);
-    std::string conf_name = path.substr(pos + 1);
-    std::string data_prefix = "dataset/data/" + g_map[conf_name];
-
     if (no_lin) {
+        int pos = path.find('/', path.find('/', path.find('/') + 1) + 1);
+        std::string conf_name = path.substr(pos + 1);
+        std::string data_prefix = "dataset/data/" + g_map[conf_name];
+
+        Slight slight(conv_thold, decay, max_iter, print_period, convergence_check_period, start_seed, min_leakage);
+        for (int i = 0; i < num_instances; i++) {
+            slight.seed++;
+            slight.init(data_prefix + std::to_string(i) + ".txt");
+            slight.run();
+        }
         return 0;
     }
 
