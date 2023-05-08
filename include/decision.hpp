@@ -1,31 +1,59 @@
 #ifndef __DECISION_HPP__
 #define __DECISION_HPP__
-#include <cmath>
-#define N 100
-#define K 1
+#include "numpy.hpp"
 
-void quadratic(float **pheromone) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            pheromone[i][j] = pheromone[i][j] * pheromone[i][j];
-        }
-    }
-}
+// Decison类，只能用于继承
+class Decision {
+public:
+    virtual Matrix decide(Matrix pher, Matrix adj) = 0;
+};
 
-void slight(float **pheromone) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            pheromone[i][j] = pow(pheromone[i][j], 1.1f);
-        }
+class Linear : public Decision {
+public:
+    Matrix decide(Matrix pher, Matrix adj) override {
+        Matrix res(pher.shape().first, pher.shape().second);
+        res = pher;
+        return res;
     }
-}
+};
 
-void quadratic_with_offset(float **pheromone) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            pheromone[i][j] = (pheromone[i][j] + K) * (pheromone[i][j] + K);
+class Quadratic : public Decision {
+public:
+    Matrix decide(Matrix pher, Matrix adj) override {
+        Matrix res(pher.shape().first, pher.shape().second);
+        for (int i = 0; i < adj.shape().first; i++) {
+            for (int j = 0; j < adj.shape().second; j++) {
+                res.set(i, j, adj.get(i, j) * std::pow(pher.get(i, j), 2));
+            }
         }
+        return res;
     }
-}
+};
+
+class QuaraticWithOffset : public Decision {
+public:
+    Matrix decide(Matrix pher, Matrix adj) override {
+        Matrix res(pher.shape().first, pher.shape().second);
+        for (int i = 0; i < adj.shape().first; i++) {
+            for (int j = 0; j < adj.shape().second; j++) {
+                res.set(i, j, adj.get(i, j) * std::pow(pher.get(i, j) + 1e-12, 2));
+            }
+        }
+        return res;
+    }
+};
+
+class Slight : public Decision {
+public:
+    Matrix decide(Matrix pher, Matrix adj) override {
+        Matrix res(pher.shape().first, pher.shape().second);
+        for (int i = 0; i < adj.shape().first; i++) {
+            for (int j = 0; j < adj.shape().second; j++) {
+                res.set(i, j, adj.get(i, j) * std::pow(pher.get(i, j), 1.1));
+            }
+        }
+        return res;
+    }
+};
 
 #endif // __DECISION_HPP__

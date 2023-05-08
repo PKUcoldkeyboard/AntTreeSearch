@@ -1,110 +1,106 @@
 #ifndef __UTILS_HPP__
 #define __UTILS_HPP__
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <eigen3/Eigen/Dense>
 
-constexpr int N = 100;
+#include "numpy.hpp"
+#include "dijkstra.hpp"
+#include "decision.hpp"
+#include <unordered_set>
 
-// 链式前向星
-class Graph {
-public:
-    int n;
-    struct Edge {
-        int to;
-        int next;
-        double weight;
-    };
-    Graph(int n) : n(n) {
-        head.resize(n, -1);
-    }
-    std::vector<Edge> edges;
-    std::vector<int> head;
-
-    void add_edge(int u, int v, double weight) {
-        edges.emplace_back(Edge{v, head[u], weight});
-        head[u] = edges.size() - 1;
-    }
-};
-
-// 使用dijkstra算法计算最短路径，返回路径
-std::vector<int> dijkstra(int start, int end, Eigen::MatrixXd &graph) {
-    // 使用链式前向星重新存图
-    Graph g(N);
-    for (int u = 0; u < N; u++) {
-        for (int v = 0; v < N; v++) {
-            if (graph(u, v) != 0.0) {
-                g.add_edge(u, v, graph(u, v));
+float pherArgmin(Matrix pher, Matrix optPath) {
+    float res = FLT_MAX;
+    for (int i = 0; i < pher.shape().first; i++) {
+        for (int j = 0; j < pher.shape().second; j++) {
+            if (optPath.get(i, j) > 0) {
+                res = std::min(res, pher.get(i, j));
             }
-        }
-    }
-
-    // 初始化
-    std::vector<int> path;
-    std::vector<int> prev(N, -1);
-    std::vector<double> dist(N, 1e300);
-    std::vector<bool> visited(N, false);
-
-    // 自定义dist的比较函数的优先队列，每次pop最小的
-    auto cmp = [&dist](int u, int v) {
-        return dist[u] > dist[v];
-    };
-    std::priority_queue<int, std::vector<int>, decltype(cmp)> pq(cmp);
-
-    // 使用优先队列的dijkstra
-    dist[start] = 0;
-    pq.push(start);
-    while (!pq.empty()) {
-        int u = pq.top();
-        pq.pop();
-        if (visited[u]) {
-            continue;
-        }
-        visited[u] = true;
-        for (int i = g.head[u]; i != -1; i = g.edges[i].next) {
-            int v = g.edges[i].to;
-            double weight = g.edges[i].weight;
-            if (visited[v]) {
-                continue;
-            }
-            if (dist[v] > dist[u] + weight) {
-                dist[v] = dist[u] + weight;
-                prev[v] = u;
-                pq.push(v);
-            }
-        }
-    }
-
-    // 计算路径
-    int curr = end;
-    while (curr != -1) {
-        path.push_back(curr);
-        curr = prev[curr];
-    }
-    std::reverse(path.begin(), path.end());
-    return path;
-}
-
-// 矩阵mat1的每行分别乘以mat2的对应行
-Eigen::MatrixXd element_wise_multiply(Eigen::MatrixXd mat1, Eigen::MatrixXd mat2) {
-    int rows = mat1.rows();
-    int cols = mat1.cols();
-    Eigen::MatrixXd res(rows, cols);
-    for (int i = 0; i < rows; i++) {
-        double product = mat2(i, 0);
-        for (int j = 0; j < cols; j++) {
-            res(i, j) = mat1(i, j) * product;
         }
     }
     return res;
 }
 
-std::vector<int> min_leakage_dijkstra(int start, int end, Eigen::MatrixXd &graph, Eigen::MatrixXd &passage) {
-    Eigen::MatrixXd weights = -passage.array().log();
-    Eigen::MatrixXd trans_weights = weights.transpose();
-    Eigen::MatrixXd weighted_graph = element_wise_multiply(graph, trans_weights);
-    return dijkstra(start, end, weighted_graph);
+Matrix rowNormalize(Matrix adj) {
+    unsigned long n = adj.shape().first;
+    Matrix res(n, n);
+    for (int i = 0; i < n; i++) {
+        float s = 0;
+        for (int j = 0; j < n; j++) {
+            s += adj.get(i, j);
+        }
+        for (int j = 0; j < n; j++) {
+            res.set(i, j, (float) (adj.get(i, j) / (s + 1e-12)));
+        }
+    }
+    return res;
+}
+
+PathInfo minLeakagePath(Matrix adj, Vector passage, int s, int d) {
+    for (int i = 0; i < passage.size(); i++) {
+        passage[i] = -log(passage[i]);
+    }
+    for (int i = 0; i < adj.shape().first; i++) {
+        for (int j = 0; j < adj.shape().second; j++) {
+            adj.set(i, j, adj.get(i, j) * passage[i]);
+        }
+    }
+    return findPath(adj, s, d);
+}
+
+Matrix addRandomShortestPath(Matrix adj, int k, int defaultLen) {
+    unsigned long n = adj.shape().first;
+    PathInfo path = findPath(adj, 0, n - 1);
+    int newPathCost = defaultLen - k;
+    if (!path.isNull()) {
+        newPathCost = int(path.totalCost - k);
+    }
+    int curNode = 0;
+    if (newPathCost <= 0) {
+        return adj;
+    }
+    Random random;
+    for (int co = 1; co < newPathCost; co++) {
+        float curCostF = 0;
+        float curCostB = 0;
+        int nextNode = -1;
+        while (curCostF <= co || curCostB <= newPathCost - co) {
+            nextNode = random.randint(1, n - 1);
+            path = findPath(adj, 0, nextNode);
+            curCostF = path.isNull()? FLT_MAX : path.totalCost;
+            path = findPath(adj, nextNode, n - 1);
+            curCostB = path.isNull()? FLT_MAX : path.totalCost;
+        }
+        adj.set(curNode, nextNode, 1);
+        curNode = nextNode;
+    }
+    adj.set(curNode, n - 1, 1);
+    return adj;
+}
+
+bool checkConvergence(Matrix pher, Matrix adj, float thold, Matrix optPath, Decision* decision) {
+    int n = (int) pher.shape().first;
+    Matrix fNormPher = decision->decide(pher, adj);
+    fNormPher = rowNormalize(fNormPher);
+    Matrix bNormPher = decision->decide(pher.transpose(), adj.transpose());
+    bNormPher = rowNormalize(bNormPher);
+    int curNode = 0;
+    std::unordered_set<int> curSet;
+    while (curNode != n - 1 && curSet.find(curNode) == curSet.end()) {
+        curSet.insert(curNode);
+        if (arrayMax(fNormPher.get(curNode)) == 0) break;
+        if (arrayMax(fNormPher.get(curNode)) < thold) return false;
+        curNode = arrayArgmax(fNormPher.get(curNode));
+    }
+    if (curSet.size() > optPath.reduceSum()) {
+        return false;
+    }
+    curNode = n - 1;
+    curSet.clear();
+    while (curNode != 0 && curSet.find(curNode) == curSet.end()) {
+        curSet.insert(curNode);
+        if (arrayMax(bNormPher.get(curNode)) == 0) break;
+        if (arrayMax(bNormPher.get(curNode)) < thold) return false;
+        curNode = arrayArgmax(bNormPher.get(curNode));
+    }
+    return curSet.size() <= optPath.reduceSum();
 }
 
 #endif // __UTILS_HPP__
