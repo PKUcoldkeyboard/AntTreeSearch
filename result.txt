@@ -1,50 +1,18 @@
-gnp_w_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_w_loop_wo_leakage - W: Converged Rate: 1, Avg Converged iterations: 539.7
-gnp_w_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_w_loop_w_leakage - W: Converged Rate: 0.51, Avg Converged iterations: 590.196
-gnp_wo_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_wo_loop_wo_leakage - W: Converged Rate: 1, Avg Converged iterations: 622.2
-gnp_wo_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_wo_loop_w_leakage - W: Converged Rate: 0.53, Avg Converged iterations: 645.283
-gnpLoc_w_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnpLoc_w_loop_wo_leakage - W: Converged Rate: 0.92, Avg Converged iterations: 473.696
-gnpLoc_w_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnpLoc_w_loop_w_leakage - W: Converged Rate: 0.06, Avg Converged iterations: 830
-gnpLoc_wo_loop_wo_leakage - WO: Converged Rate: 0.15, Avg Converged iterations: 111.333
-gnpLoc_wo_loop_wo_leakage - W: Converged Rate: 0.92, Avg Converged iterations: 453.261
-gnpLoc_wo_loop_w_leakage - WO: Converged Rate: 0.06, Avg Converged iterations: 163.333
-gnpLoc_wo_loop_w_leakage - W: Converged Rate: 0.2, Avg Converged iterations: 526.5
-grid_wo_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-grid_wo_loop_wo_leakage - W: Converged Rate: 0.21, Avg Converged iterations: 825.714
-grid_wo_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-grid_wo_loop_w_leakage - W: Converged Rate: 0, Avg Converged iterations: -nan
-
-gnp_w_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_w_loop_wo_leakage - W: Converged Rate: 0.06, Avg Converged iterations: 788.333
-
-gnp_w_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_w_loop_w_leakage - W: Converged Rate: 0.03, Avg Converged iterations: 796.667
-
-gnp_wo_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_wo_loop_wo_leakage - W: Converged Rate: 0.07, Avg Converged iterations: 744.286
-
-gnp_wo_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnp_wo_loop_w_leakage - W: Converged Rate: 0.04, Avg Converged iterations: 592.5
-
-gnpLoc_w_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnpLoc_w_loop_wo_leakage - W: Converged Rate: 0.17, Avg Converged iterations: 700.588
-
-gnpLoc_w_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-gnpLoc_w_loop_w_leakage - W: Converged Rate: 0, Avg Converged iterations: -nan
-
-gnpLoc_wo_loop_wo_leakage - WO: Converged Rate: 0.15, Avg Converged iterations: 110.667
-gnpLoc_wo_loop_wo_leakage - W: Converged Rate: 0.3, Avg Converged iterations: 350.667
-
-gnpLoc_wo_loop_w_leakage - WO: Converged Rate: 0.06, Avg Converged iterations: 161.667
-gnpLoc_wo_loop_w_leakage - W: Converged Rate: 0.07, Avg Converged iterations: 311.429
-
-grid_wo_loop_wo_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-grid_wo_loop_wo_leakage - W: Converged Rate: 0, Avg Converged iterations: -nan
-
-grid_wo_loop_w_leakage - WO: Converged Rate: 0, Avg Converged iterations: -nan
-grid_wo_loop_w_leakage - W: Converged Rate: 0, Avg Converged iterations: -nan
+gnp_wo_loop_wo_leakage - WO: Converged Rate: 0.49, Avg Converged iterations: 33.8776
+gnp_wo_loop_wo_leakage - W: Converged Rate: 0.51, Avg Converged iterations: 23.1373
+gnpLoc_w_loop_wo_leakage - WO: Converged Rate: 0.85, Avg Converged iterations: 58.3529
+gnpLoc_w_loop_wo_leakage - W: Converged Rate: 0.92, Avg Converged iterations: 41.6304
+gnpLoc_wo_loop_wo_leakage - WO: Converged Rate: 0.63, Avg Converged iterations: 45.3968
+gnpLoc_wo_loop_wo_leakage - W: Converged Rate: 0.78, Avg Converged iterations: 34.6154
+grid_wo_loop_wo_leakage - WO: Converged Rate: 0.03, Avg Converged iterations: 60
+grid_wo_loop_wo_leakage - W: Converged Rate: 0.08, Avg Converged iterations: 51.25
+gnp_w_loop_w_leakage - WO: Converged Rate: 1, Avg Converged iterations: 58.6
+gnp_w_loop_w_leakage - W: Converged Rate: 1, Avg Converged iterations: 55.6
+gnp_wo_loop_w_leakage - WO: Converged Rate: 0.47, Avg Converged iterations: 44.4681
+gnp_wo_loop_w_leakage - W: Converged Rate: 0.49, Avg Converged iterations: 44.2857
+gnpLoc_w_loop_w_leakage - WO: Converged Rate: 0.82, Avg Converged iterations: 105.732
+gnpLoc_w_loop_w_leakage - W: Converged Rate: 0.88, Avg Converged iterations: 112.273
+gnpLoc_wo_loop_w_leakage - WO: Converged Rate: 0.76, Avg Converged iterations: 75.5263
+gnpLoc_wo_loop_w_leakage - W: Converged Rate: 0.83, Avg Converged iterations: 79.3976
+grid_wo_loop_w_leakage - WO: Converged Rate: 0.12, Avg Converged iterations: 270
+grid_wo_loop_w_leakage - W: Converged Rate: 1, Avg Converged iterations: 98.6
