@@ -37,7 +37,7 @@ std::pair<int, int> run(Matrix adj, bool minLeakage, unsigned long n, float deca
     {
         decision = new Quadratic();
     }
-    else if (rule == "quaratic-with-offset")
+    else if (rule == "quadratic-with-offset")
     {
         decision = new QuadraticWithOffset();
     }
