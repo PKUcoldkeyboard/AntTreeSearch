@@ -1,6 +1,5 @@
 # AntTreeSearch
 ![](https://img.shields.io/badge/Version-0.1-orange.svg)
-[![eigen](https://img.shields.io/badge/eigen-3.4.0-blueviolet.svg)](http://eigen.tuxfamily.org/)
 
 本项目是根据论文[1] Garg S, Shiragur K, Gordon D M, et al. Distributed algorithms from arboreal ants for the shortest path problem[J]. Proceedings of the National Academy of Sciences, 2023, 120(6): e2207959120，基于C++复现的受树栖蚂蚁行为启发的用于解决最短路径问题的分布式算法————蚂蚁树搜索（ATS）算法。
 
@@ -14,21 +13,20 @@ ATS使用的一些关键概念包括信息素轨迹，即蚂蚁四处移动时�
 - C++11
 - CMake 3.22.1
 - Ubuntu 20.04
-- Eigen 3.4.0
 
 ## 如何使用
 - 本项目使用CMake进行编译，因此需要安装CMake。
-- 本项目使用Eigen库，因此需要安装Eigen(https://github.com/PX4/eigen)。
-```
-sudo apt-get install libeigen3-dev
-```
+
 - 编译
 ```
 cmake -B build && cmake --build build
 ```
 - 运行
 ```
-./build/ATS <config file>
+./build/ATS <desicion_rule> <min_leakage>
+
+(eg. ./build/ATS linear 0)
+```
 ```
 
 ## 数据集
