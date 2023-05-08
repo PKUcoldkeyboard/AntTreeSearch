@@ -36,7 +36,7 @@ public:
         Matrix res(pher.shape().first, pher.shape().second);
         for (int i = 0; i < adj.shape().first; i++) {
             for (int j = 0; j < adj.shape().second; j++) {
-                res.set(i, j, adj.get(i, j) * std::pow(pher.get(i, j) + 1e-12, 2));
+                res.set(i, j, adj.get(i, j) * std::pow(pher.get(i, j) + 0.5, 2));
             }
         }
         return res;
