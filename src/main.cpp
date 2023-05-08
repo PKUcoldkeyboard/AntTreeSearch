@@ -100,15 +100,7 @@ int main(int argc, char const *argv[]) {
 
             std::string graphName = filename;
 
-            // 读取配置文件
-            std::string configName = "conf/" + filename + ".ini";
-            auto ini = util::inifile(configName);
-            if (!ini.good()) {
-                SPDLOG_ERROR(ini.error());
-                exit(-1);
-            }
-
-            auto minLeakage = ini.get_bool("min_leakage");
+            auto minLeakage = true;
             float decay = 0.9;
             float convThold = 0.99;
             int n = 100;
@@ -148,11 +140,11 @@ int main(int argc, char const *argv[]) {
                     countWO += 1;
                 }
             }
-            SPDLOG_INFO("WO: Converged Rate: {:03.5f}, Avg Converged iterations: {}", countWO / (k+1), IterCountWO / countWO);
-            SPDLOG_INFO("W: Converged Rate: {:03.5f}, Avg Converged iterations: {}", countW / (k+1), IterCountW / countW);
+            SPDLOG_INFO("WO: Converged Rate: {:03.5f}, Avg Converged iterations: {}", countWO / k, IterCountWO / countWO);
+            SPDLOG_INFO("W: Converged Rate: {:03.5f}, Avg Converged iterations: {}", countW / k, IterCountW / countW);
 
-            file << graphName << " - WO: Converged Rate: " << countWO / (k+1) << ", Avg Converged iterations: " << IterCountWO / countWO << std::endl;
-            file << graphName << " - W: Converged Rate: " << countW / (k+1) << ", Avg Converged iterations: " << IterCountW / countW << std::endl;     
+            file << graphName << " - WO: Converged Rate: " << countWO / k << ", Avg Converged iterations: " << IterCountWO / countWO << std::endl;
+            file << graphName << " - W: Converged Rate: " << countW / k << ", Avg Converged iterations: " << IterCountW / countW << std::endl;     
         }
     }
 

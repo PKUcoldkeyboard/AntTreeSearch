@@ -6,7 +6,7 @@
 
 int simulate(Matrix adj, Vector passage, float incRate, float decay, Matrix optPath,
              Matrix pher, float ffStart = 1, float bfEnd = 1, float thold = 0.999, Decision *decision = new Linear(),
-             int printPeriod = 500, int convCheckPeriod = 10, int maxIter = 5000) {
+             int printPeriod = 500, int convCheckPeriod = 10, int maxIter = 1000) {
     
     unsigned long n = adj.shape().first;
     Vector ff(n, 0);
