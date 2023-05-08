@@ -102,6 +102,7 @@ public:
                 res.set(i, j, data[i][j]);
             }
         }
+        return res;
     }
 
     float reduceSum() {
@@ -219,6 +220,15 @@ Matrix matrixMulScalar(Matrix mat, float sca) {
     return mat;
 }
 
+Matrix matrixByScalar(Matrix mat, float sca) {
+    for (int i = 0; i < mat.shape().first; i++) {
+        for (int j = 0; j < mat.shape().second; j++) {
+            mat.set(i, j, mat.get(i, j) / (sca + 1e-12));
+        }
+    }
+    return mat;
+}
+
 Vector vectorMulScalar(Vector vec, float sca) {
     for (int i = 0; i < vec.size(); i++) {
         vec[i] *= sca;
@@ -229,6 +239,13 @@ Vector vectorMulScalar(Vector vec, float sca) {
 Vector vectorAddScalar(Vector vec, float sca) {
     for (int i = 0; i < vec.size(); i++) {
         vec[i] += sca;
+    }
+    return vec;
+}
+
+Vector vectorByScalar(Vector vec, float sca) {
+    for (int i = 0; i < vec.size(); i++) {
+        vec[i] /= (sca + 1e-12);
     }
     return vec;
 }

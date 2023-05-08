@@ -61,6 +61,7 @@ PathInfo findPath(Matrix adj, int start, int end) {
 
     std::vector<float> totalCosts(n, FLT_MAX);
     std::vector<int> prev(n, -1);
+    std::vector<int> nodes;
     std::vector<bool> sure(n, false);
 
     Graph g = create(adj);
@@ -71,8 +72,6 @@ PathInfo findPath(Matrix adj, int start, int end) {
         return totalCosts[u] > totalCosts[v];
     };
     std::priority_queue<int, std::vector<int>, decltype(cmp)> pq(cmp);
-
-    std::vector<std::vector<int>> nodes = *(new std::vector<std::vector<int>>(n, std::vector<int>()));
 
     pq.push(start);
     while (!pq.empty()) {
@@ -91,7 +90,7 @@ PathInfo findPath(Matrix adj, int start, int end) {
             if (totalCosts[v] > totalCosts[u] + weight) {
                 totalCosts[v] = totalCosts[u] + weight;
                 // 记录路径
-                nodes[v] = nodes[u];
+                prev[v] = u;
                 pq.push(v);
             }
         }
@@ -102,7 +101,14 @@ PathInfo findPath(Matrix adj, int start, int end) {
     if (totalCosts[end] == FLT_MAX) {
         return PathInfo();
     }
-    PathInfo pathInfo = PathInfo(nodes[end], totalCosts[end]);
+    int curr = end;
+    while (curr != -1) {
+        nodes.push_back(curr);
+        curr = prev[curr];
+    
+    }
+    std::reverse(nodes.begin(), nodes.end());
+    PathInfo pathInfo = PathInfo(nodes, totalCosts[end]);
     return pathInfo;
 }
 

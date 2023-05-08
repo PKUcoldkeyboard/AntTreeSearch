@@ -30,7 +30,7 @@ public:
     }
 };
 
-class QuaraticWithOffset : public Decision {
+class QuadraticWithOffset : public Decision {
 public:
     Matrix decide(Matrix pher, Matrix adj) override {
         Matrix res(pher.shape().first, pher.shape().second);
