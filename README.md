@@ -26,7 +26,7 @@ cmake -B build && cmake --build build
 ./build/ATS <desicion_rule> <min_leakage>
 
 (eg. ./build/ATS linear 0)
-```
+
 ```
 
 ## 数据集
