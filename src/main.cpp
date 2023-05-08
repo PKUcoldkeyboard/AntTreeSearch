@@ -60,10 +60,6 @@ int main(int argc, const char* argv[]) {
         return 0;
     }
 
-    int pos = path.find('/', path.find('/') + 1);
-    std::string conf_name = path.substr(pos + 1);
-    std::string data_prefix = "dataset/data/" + g_map[conf_name];
-
     Baseline baseline(conv_thold, decay, max_iter, print_period, convergence_check_period, start_seed, min_leakage);
     for (int i = 0; i < num_instances; i++) {
         baseline.seed++;
