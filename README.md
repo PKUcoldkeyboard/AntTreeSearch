@@ -1,5 +1,6 @@
 # AntTreeSearch
 ![](https://img.shields.io/badge/Version-0.1-orange.svg)
+![](https://img.shields.io/github/stars/PKUcoldkeyboard/AntTreeSearch?style=social)
 
 [English](README-en.md) | [简体中文](README.md)
 
